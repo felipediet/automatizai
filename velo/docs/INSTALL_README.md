@@ -31,8 +31,14 @@ Comandos básicos para rodar testes
   yarn playwright test example
     Runs the tests in a specific file.
 
+  yarn playwright test -g 'webapp deve estar online'
+    Runs the tests with an especific scneario.
+
   yarn playwright test --debug
     Runs the tests in debug mode.
+
+  yarn playwright test --debug -g 'webapp deve estar online'
+    Runs the tests in debug mode with an especific scneario.
 
   yarn playwright codegen
     Auto generate tests with Codegen.
