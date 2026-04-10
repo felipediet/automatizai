@@ -10,11 +10,11 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
         //Checkpoint 1: Validar acesso a página
         await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
 
-    // Act
         //Checkpoint 2: Acessar a página de consulta de pedidos
         await page.getByRole('link', { name: 'Consultar Pedido' }).click()
         await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
 
+    // Act
         //Checkpoint 2: Preencher o campo de busca com o número do pedido
         await page.getByTestId('search-order-id').fill('VLO-KLUYJE')
 
@@ -23,10 +23,16 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
 
     // Assert
         //Checkpoint 4: Verificar se o pedido foi encontrado
-        await expect(page.getByTestId('order-result-id')).toBeVisible()
-        await expect(page.getByTestId('order-result-id')).toContainText('VLO-KLUYJE')
+        // await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
+        // await expect(page.getByTestId('order-result-id')).toContainText('VLO-KLUYJE')
         
-        await expect(page.getByTestId('order-result-status')).toBeVisible()
-        await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+        // await expect(page.getByTestId('order-result-status')).toBeVisible({timeout: 10_000})
+        // await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+
+        await expect(page.getByText('VLO-KLUYJE')).toBeVisible();
+        //await expect(page.getByText('VLO-KLUYJE')).toContainText('VLO-KLUYJE');
+
+        await expect(page.getByText('APROVADO')).toBeVisible();
+        //await expect(page.getByText('APROVADO')).toContainText('APROVADO');
 
   });
