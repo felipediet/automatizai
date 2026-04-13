@@ -4,6 +4,10 @@ import { test, expect } from '@playwright/test'
 /// AAA - Arrange, Act, Assert
 
 test('deve consultar um pedido aprovado', async ({ page }) => {
+
+    //Teste Data
+    const order = 'VLO-KLUYJE'
+
     // Arrange
         await page.goto('http://localhost:5173/')
         
@@ -16,7 +20,7 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
 
     // Act
         //Checkpoint 2: Preencher o campo de busca com o número do pedido
-        await page.getByTestId('search-order-id').fill('VLO-KLUYJE')
+        await page.getByTestId('search-order-id').fill(order)
 
         //Checkpoint 3: Clicar no botão de buscar pedido
         await page.getByTestId('search-order-button').click()
@@ -24,7 +28,7 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
     // Assert
         //Checkpoint 4: Verificar se o pedido foi encontrado
         await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
-        await expect(page.getByTestId('order-result-id')).toContainText('VLO-KLUYJE')
+        await expect(page.getByTestId('order-result-id')).toContainText(order)
         
         await expect(page.getByTestId('order-result-status')).toBeVisible({timeout: 10_000})
         await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
@@ -34,7 +38,7 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
             .filter({hasText: /^Pedido$/})
             .locator('..')
 
-        await expect(containerPedido).toContainText('VLO-KLUYJE')
+        await expect(containerPedido).toContainText(order)
         await expect(page.getByText('APROVADO')).toBeVisible();
 
         // await expect(page.getByText('VLO-KLUYJE')).toBeVisible();
