@@ -23,16 +23,24 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
 
     // Assert
         //Checkpoint 4: Verificar se o pedido foi encontrado
-        // await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
-        // await expect(page.getByTestId('order-result-id')).toContainText('VLO-KLUYJE')
+        await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
+        await expect(page.getByTestId('order-result-id')).toContainText('VLO-KLUYJE')
         
-        // await expect(page.getByTestId('order-result-status')).toBeVisible({timeout: 10_000})
-        // await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+        await expect(page.getByTestId('order-result-status')).toBeVisible({timeout: 10_000})
+        await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
 
-        await expect(page.getByText('VLO-KLUYJE')).toBeVisible();
-        //await expect(page.getByText('VLO-KLUYJE')).toContainText('VLO-KLUYJE');
+        //Usando expressão regular para filtrar texto de uma forma mais segura e robusta
+        const containerPedido = page.getByRole('paragraph')
+            .filter({hasText: /^Pedido$/})
+            .locator('..')
 
+        await expect(containerPedido).toContainText('VLO-KLUYJE')
         await expect(page.getByText('APROVADO')).toBeVisible();
-        //await expect(page.getByText('APROVADO')).toContainText('APROVADO');
+
+        // await expect(page.getByText('VLO-KLUYJE')).toBeVisible();
+        // //await expect(page.getByText('VLO-KLUYJE')).toContainText('VLO-KLUYJE');
+
+        // await expect(page.getByText('APROVADO')).toBeVisible();
+        // //await expect(page.getByText('APROVADO')).toContainText('APROVADO');
 
   });
