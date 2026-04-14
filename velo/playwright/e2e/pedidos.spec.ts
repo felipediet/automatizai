@@ -7,7 +7,7 @@ import { generateOrderCode } from '../support/helpers';
 test('deve consultar um pedido aprovado', async ({ page }) => {
 
     //Teste Data
-    const order = generateOrderCode();
+    const order = 'VLO-KLUYJE'
 
     // Arrange
         await page.goto('/')
