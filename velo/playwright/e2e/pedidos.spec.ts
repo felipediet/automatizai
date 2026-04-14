@@ -31,11 +31,10 @@ test.describe('Consulta de Pedidos', () => {
         console.log('afterAll: roda uma vez depois de todos os testes.')
     })
 
-    test('deve consultar um pedido aprovado', async ({ page }) => {
+    test('deve consultar um pedido APROVADO', async ({ page }) => {
 
         //Teste Data
         const order = 'VLO-KLUYJE'
-
 
         // Act
         //await page.getByTestId('search-order-id').fill(order)
@@ -68,45 +67,56 @@ test.describe('Consulta de Pedidos', () => {
 
     })
 
-    test('deve consultar um pedido aprovado - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido APROVADO - com AriaSnapshot', async ({ page }) => {
 
         //Teste Data
-        const order = 'VLO-KLUYJE'
+        //const order = 'VLO-KLUYJE'
 
+        const order = {
+            number: 'VLO-KLUYJE',
+            status: 'APROVADO',
+            color: 'Lunar White',
+            wheels: 'sport Wheels',
+            customer: {
+                name: 'Felipe Diet',
+                email: 'diet@velo.dev'
+            },
+            payment: 'À Vista'
+        }
 
         // Act
         //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order)
+        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
 
         //await page.getByTestId('search-order-button').click()
         await page.getByRole('button', { name: 'Buscar Pedido'}).click()
  
-        await expect(page.getByTestId('order-result-VLO-KLUYJE')).toMatchAriaSnapshot(`
+        await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
             - img
             - paragraph: Pedido
-            - paragraph: VLO-KLUYJE
+            - paragraph: ${order.number}
             - img
-            - text: APROVADO
+            - text: ${order.status}
             - img "Velô Sprint"
             - paragraph: Modelo
             - paragraph: Velô Sprint
             - paragraph: Cor
-            - paragraph: Lunar White
+            - paragraph: ${order.color}
             - paragraph: Interior
             - paragraph: cream
             - paragraph: Rodas
-            - paragraph: sport Wheels
+            - paragraph: ${order.wheels}
             - heading "Dados do Cliente" [level=4]
             - paragraph: Nome
-            - paragraph: Felipe Diet
+            - paragraph: ${order.customer.name}
             - paragraph: Email
-            - paragraph: diet@velo.dev
+            - paragraph: ${order.customer.email}
             - paragraph: Loja de Retirada
             - paragraph
             - paragraph: Data do Pedido
             - paragraph: /\\d+\\/\\d+\\/\\d+/
             - heading "Pagamento" [level=4]
-            - paragraph: À Vista
+            - paragraph: ${order.payment}
             - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
             `);
 
@@ -147,6 +157,61 @@ test.describe('Consulta de Pedidos', () => {
             `)
 
         
+
+    })
+
+    test('deve consultar um pedido REPROVADO - com AriaSnapshot', async ({ page }) => {
+
+        //Teste Data
+        //const order = 'VLO-UWM26W'
+
+        const order = {
+            number: 'VLO-UWM26W',
+            status: 'REPROVADO',
+            color: 'Midnight Black',
+            wheels: 'sport Wheels',
+            customer: {
+                name: 'Steve Jobs',
+                email: 'jobs@apple.com'
+            },
+            payment: 'À Vista'
+        }
+
+        // Act
+        //await page.getByTestId('search-order-id').fill(order)
+        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
+
+        //await page.getByTestId('search-order-button').click()
+        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+ 
+        await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
+            - img
+            - paragraph: Pedido
+            - paragraph: ${order.number}
+            - img
+            - text: ${order.status}
+            - img "Velô Sprint"
+            - paragraph: Modelo
+            - paragraph: Velô Sprint
+            - paragraph: Cor
+            - paragraph: ${order.color}
+            - paragraph: Interior
+            - paragraph: cream
+            - paragraph: Rodas
+            - paragraph: ${order.wheels}
+            - heading "Dados do Cliente" [level=4]
+            - paragraph: Nome
+            - paragraph: ${order.customer.name}
+            - paragraph: Email
+            - paragraph: ${order.customer.email}
+            - paragraph: Loja de Retirada
+            - paragraph
+            - paragraph: Data do Pedido
+            - paragraph: /\\d+\\/\\d+\\/\\d+/
+            - heading "Pagamento" [level=4]
+            - paragraph: ${order.payment}
+            - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+            `);
 
     })
 
