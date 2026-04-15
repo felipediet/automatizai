@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { generateOrderCode } from '../support/helpers';
+import { generateOrderCode, searchOrder } from '../support/helpers';
 
 
 /// AAA - Arrange, Act, Assert
 
-test.describe('Consulta de Pedidos', () => {
+test.describe('Consulta de Pedidos - Papito', () => {
 
     test.beforeAll(async () => {
         console.log('beforeAll: roda uma vez antes de todos os testes.')
@@ -34,41 +34,6 @@ test.describe('Consulta de Pedidos', () => {
     test('deve consultar um pedido APROVADO', async ({ page }) => {
 
         //Teste Data
-        const order = 'VLO-KLUYJE'
-
-        // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
-
-        // Assert
-            //Verificar se o pedido foi encontrado
-            // await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
-            // await expect(page.getByTestId('order-result-id')).toContainText(order)
-            
-            // await expect(page.getByTestId('order-result-status')).toBeVisible({timeout: 10_000})
-            // await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
-
-        //Usando expressão regular para filtrar texto de uma forma mais segura e robusta
-        const containerPedido = page.getByRole('paragraph')
-            .filter({hasText: /^Pedido$/})
-            .locator('..')
-
-        await expect(containerPedido).toContainText(order, {timeout: 10_000})
-        await expect(page.getByText('APROVADO')).toBeVisible();
-
-        // await expect(page.getByText('VLO-KLUYJE')).toBeVisible();
-        // //await expect(page.getByText('VLO-KLUYJE')).toContainText('VLO-KLUYJE');
-
-        // await expect(page.getByText('APROVADO')).toBeVisible();
-        // //await expect(page.getByText('APROVADO')).toContainText('APROVADO');
-
-    })
-
-    test('deve consultar um pedido APROVADO - com AriaSnapshot', async ({ page }) => {
-
-        //Teste Data
         //const order = 'VLO-KLUYJE'
 
         const order = {
@@ -84,10 +49,7 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        await searchOrder(page, order.number)
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -134,31 +96,8 @@ test.describe('Consulta de Pedidos', () => {
         const order = generateOrderCode();
         
         // Act
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order)
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click() 
+       await searchOrder(page, order)
         
-
-        // Assert
-        //Opção 0
-        // await expect(page.locator('#root')).toContainText('Pedido não encontrado');
-        // await expect(page.locator('#root')).toContainText('Verifique o número do pedido e tente novamente');
-
-
-        //Opção 1
-        //const title = page.getByText('Pedido não encontrado' })
-
-        //Opção 2
-        // const title = page.getByRole('heading', { name: 'Pedido não encontrado' })
-        // await expect(title).toBeVisible()
-
-
-
-        //Opção 1
-        //const message = page.getByText('Verifique o número do pedido e tente novamente')
-        
-        //Opção 2
-        // const message = page.locator('p', { hasText: 'Verifique o número do pedido e tente novamente' })
-        // await expect(message).toBeVisible()
 
         // Assert
         await expect(page.locator('#root')).toMatchAriaSnapshot(`
@@ -171,7 +110,7 @@ test.describe('Consulta de Pedidos', () => {
 
     })
 
-    test('deve consultar um pedido REPROVADO - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido REPROVADO', async ({ page }) => {
 
         //Teste Data
         //const order = 'VLO-UWM26W'
@@ -189,10 +128,7 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        await searchOrder(page, order.number)
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -234,7 +170,7 @@ test.describe('Consulta de Pedidos', () => {
 
     })
 
-    test('deve consultar um pedido EM ANALISE - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido EM ANALISE', async ({ page }) => {
 
         //Teste Data
         //const order = 'VLO-UWM26W'
@@ -252,10 +188,7 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        await searchOrder(page, order.number)
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
