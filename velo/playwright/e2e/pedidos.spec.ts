@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers';
+import { OrderLookupPage } from '../support/pages/OrderLoockupPage';
 
 
 /// AAA - Arrange, Act, Assert
@@ -37,10 +38,8 @@ test.describe('Consulta de Pedidos', () => {
         const order = 'VLO-KLUYJE'
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order);
 
         // Assert
             //Verificar se o pedido foi encontrado
@@ -84,10 +83,8 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -134,8 +131,8 @@ test.describe('Consulta de Pedidos', () => {
         const order = generateOrderCode();
         
         // Act
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order)
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click() 
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order);
         
 
         // Assert
@@ -189,10 +186,8 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -252,10 +247,8 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        //await page.getByTestId('search-order-id').fill(order)
-        await page.getByRole('textbox', { name: 'Número do Pedido'}).fill(order.number)
-        //await page.getByTestId('search-order-button').click()
-        await page.getByRole('button', { name: 'Buscar Pedido'}).click()
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { generateOrderCode, searchOrder } from '../support/helpers';
+import { generateOrderCode } from '../support/helpers';
+import { OrderLookupPage } from '../support/pages/OrderLoockupPage';
 
 
 /// AAA - Arrange, Act, Assert
@@ -49,7 +50,8 @@ test.describe('Consulta de Pedidos - Papito', () => {
         }
 
         // Act
-        await searchOrder(page, order.number)
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -96,7 +98,8 @@ test.describe('Consulta de Pedidos - Papito', () => {
         const order = generateOrderCode();
         
         // Act
-       await searchOrder(page, order)
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order);
         
 
         // Assert
@@ -128,7 +131,8 @@ test.describe('Consulta de Pedidos - Papito', () => {
         }
 
         // Act
-        await searchOrder(page, order.number)
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -188,7 +192,8 @@ test.describe('Consulta de Pedidos - Papito', () => {
         }
 
         // Act
-        await searchOrder(page, order.number)
+        const orderLookupPage = new OrderLookupPage(page);
+        await orderLookupPage.searchOrder(order.number);
  
         // Assert
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
