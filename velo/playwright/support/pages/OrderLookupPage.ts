@@ -15,9 +15,9 @@ export type OrderData = {
 }
 
 const STATUS_CONFIG: Record<OrderStatus, { bgClass: string; textClass: string; iconClass: string }> = {
-    APROVADO:   { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
-    REPROVADO:  { bgClass: 'bg-red-100',   textClass: 'text-red-700',   iconClass: 'lucide-circle-x'         },
-    EM_ANALISE: { bgClass: 'bg-amber-100', textClass: 'text-amber-700', iconClass: 'lucide-clock1'           },
+    APROVADO: { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
+    REPROVADO: { bgClass: 'bg-red-100', textClass: 'text-red-700', iconClass: 'lucide-circle-x' },
+    EM_ANALISE: { bgClass: 'bg-amber-100', textClass: 'text-amber-700', iconClass: 'lucide-clock1' },
 }
 
 export class OrderLookupPage {
@@ -30,11 +30,20 @@ export class OrderLookupPage {
         this.searchButton = page.getByTestId('search-order-button')
     }
 
+    /**
+    * Preenche o campo de busca com o número do pedido e aciona a pesquisa.
+    * @param orderNumber - Número do pedido no formato VLO-XXXXXX
+    */
     async searchOrder(orderNumber: string): Promise<void> {
         await this.searchInput.fill(orderNumber)
         await this.searchButton.click()
     }
 
+    /**
+    * Valida o resultado completo de um pedido:
+    * estrutura acessível via AriaSnapshot e badge de status (cor e ícone).
+    * @param order - Objeto com os dados esperados do pedido
+    */
     async assertOrderResult(order: OrderData): Promise<void> {
         await expect(this.page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
             - img
@@ -68,6 +77,11 @@ export class OrderLookupPage {
         await this.assertStatusBadge(order.status)
     }
 
+    /**
+    * Valida o badge de status de um pedido:
+    * classes CSS de cor de fundo, cor de texto e ícone SVG correspondente.
+    * @param status - Status esperado: 'APROVADO' | 'REPROVADO' | 'EM_ANALISE'
+    */
     async assertStatusBadge(status: OrderStatus): Promise<void> {
         const { bgClass, textClass, iconClass } = STATUS_CONFIG[status]
         const statusBadge = this.page.getByRole('status').filter({ hasText: status })
