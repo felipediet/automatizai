@@ -14,12 +14,6 @@ export type OrderData = {
     payment: string
 }
 
-const STATUS_CONFIG: Record<OrderStatus, { bgClass: string; textClass: string; iconClass: string }> = {
-    APROVADO: { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
-    REPROVADO: { bgClass: 'bg-red-100', textClass: 'text-red-700', iconClass: 'lucide-circle-x' },
-    EM_ANALISE: { bgClass: 'bg-amber-100', textClass: 'text-amber-700', iconClass: 'lucide-clock1' },
-}
-
 export class OrderLookupPage {
 
     private readonly searchInput
@@ -83,6 +77,13 @@ export class OrderLookupPage {
     * @param status - Status esperado: 'APROVADO' | 'REPROVADO' | 'EM_ANALISE'
     */
     async assertStatusBadge(status: OrderStatus): Promise<void> {
+
+        const STATUS_CONFIG: Record<OrderStatus, { bgClass: string; textClass: string; iconClass: string }> = {
+            APROVADO: { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
+            REPROVADO: { bgClass: 'bg-red-100', textClass: 'text-red-700', iconClass: 'lucide-circle-x' },
+            EM_ANALISE: { bgClass: 'bg-amber-100', textClass: 'text-amber-700', iconClass: 'lucide-clock1' },
+        }
+
         const { bgClass, textClass, iconClass } = STATUS_CONFIG[status]
         const statusBadge = this.page.getByRole('status').filter({ hasText: status })
 
