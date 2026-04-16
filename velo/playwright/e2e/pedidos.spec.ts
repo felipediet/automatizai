@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers';
-import { OrderLookupPage } from '../support/pages/OrderLoockupPage';
+import { OrderLookupPage, OrderData } from '../support/pages/OrderLookupPage';
 
 
 /// AAA - Arrange, Act, Assert
@@ -70,7 +70,7 @@ test.describe('Consulta de Pedidos', () => {
         //Teste Data
         //const order = 'VLO-KLUYJE'
 
-        const order = {
+        const order: OrderData = {
             number: 'VLO-KLUYJE',
             status: 'APROVADO',
             color: 'Lunar White',
@@ -87,42 +87,7 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
-            - img
-            - paragraph: Pedido
-            - paragraph: ${order.number}
-            - status:
-                - img
-                - text: ${order.status}
-            - img "Velô Sprint"
-            - paragraph: Modelo
-            - paragraph: Velô Sprint
-            - paragraph: Cor
-            - paragraph: ${order.color}
-            - paragraph: Interior
-            - paragraph: cream
-            - paragraph: Rodas
-            - paragraph: ${order.wheels}
-            - heading "Dados do Cliente" [level=4]
-            - paragraph: Nome
-            - paragraph: ${order.customer.name}
-            - paragraph: Email
-            - paragraph: ${order.customer.email}
-            - paragraph: Loja de Retirada
-            - paragraph
-            - paragraph: Data do Pedido
-            - paragraph: /\\d+\\/\\d+\\/\\d+/
-            - heading "Pagamento" [level=4]
-            - paragraph: ${order.payment}
-            - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-            `);
-
-        const statusBadge = page.getByRole('status').filter({ hasText: `${order.status}` })
-        await expect(statusBadge).toContainClass('bg-green-100')
-        await expect(statusBadge).toContainClass('text-green-700')
-
-        const iconBadge = statusBadge.locator('svg')
-        await expect(iconBadge).toContainClass('lucide-circle-check-big')
+        await orderLookupPage.assertOrderResult(order)
 
     })
 
@@ -173,7 +138,7 @@ test.describe('Consulta de Pedidos', () => {
         //Teste Data
         //const order = 'VLO-UWM26W'
 
-        const order = {
+        const order: OrderData = {
             number: 'VLO-UWM26W',
             status: 'REPROVADO',
             color: 'Midnight Black',
@@ -190,42 +155,7 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
-            - img
-            - paragraph: Pedido
-            - paragraph: ${order.number}
-            - status:
-                - img
-                - text: ${order.status}
-            - img "Velô Sprint"
-            - paragraph: Modelo
-            - paragraph: Velô Sprint
-            - paragraph: Cor
-            - paragraph: ${order.color}
-            - paragraph: Interior
-            - paragraph: cream
-            - paragraph: Rodas
-            - paragraph: ${order.wheels}
-            - heading "Dados do Cliente" [level=4]
-            - paragraph: Nome
-            - paragraph: ${order.customer.name}
-            - paragraph: Email
-            - paragraph: ${order.customer.email}
-            - paragraph: Loja de Retirada
-            - paragraph
-            - paragraph: Data do Pedido
-            - paragraph: /\\d+\\/\\d+\\/\\d+/
-            - heading "Pagamento" [level=4]
-            - paragraph: ${order.payment}
-            - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-            `);
-
-        const statusBadge = page.getByRole('status').filter({ hasText: `${order.status}` })
-        await expect(statusBadge).toContainClass('bg-red-100')
-        await expect(statusBadge).toContainClass('text-red-700')
-
-        const iconBadge = statusBadge.locator('svg')
-        await expect(iconBadge).toContainClass('lucide-circle-x')
+        await orderLookupPage.assertOrderResult(order)
 
     })
 
@@ -234,7 +164,7 @@ test.describe('Consulta de Pedidos', () => {
         //Teste Data
         //const order = 'VLO-UWM26W'
 
-        const order = {
+        const order: OrderData = {
             number: 'VLO-KN8H35',
             status: 'EM_ANALISE',
             color: 'Lunar White',
@@ -251,42 +181,7 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
-            - img
-            - paragraph: Pedido
-            - paragraph: ${order.number}
-            - status:
-                - img
-                - text: ${order.status}
-            - img "Velô Sprint"
-            - paragraph: Modelo
-            - paragraph: Velô Sprint
-            - paragraph: Cor
-            - paragraph: ${order.color}
-            - paragraph: Interior
-            - paragraph: cream
-            - paragraph: Rodas
-            - paragraph: ${order.wheels}
-            - heading "Dados do Cliente" [level=4]
-            - paragraph: Nome
-            - paragraph: ${order.customer.name}
-            - paragraph: Email
-            - paragraph: ${order.customer.email}
-            - paragraph: Loja de Retirada
-            - paragraph
-            - paragraph: Data do Pedido
-            - paragraph: /\\d+\\/\\d+\\/\\d+/
-            - heading "Pagamento" [level=4]
-            - paragraph: ${order.payment}
-            - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-            `);
-
-        const statusBadge = page.getByRole('status').filter({ hasText: `${order.status}` })
-        await expect(statusBadge).toContainClass('bg-amber-100')
-        await expect(statusBadge).toContainClass('text-amber-700')
-
-        const iconBadge = statusBadge.locator('svg')
-        await expect(iconBadge).toContainClass('lucide-clock1')
+        await orderLookupPage.assertOrderResult(order)
 
     })
 
