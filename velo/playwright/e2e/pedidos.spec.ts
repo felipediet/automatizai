@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers';
 import { OrderLookupPage, OrderData } from '../support/pages/OrderLookupPage';
+import { HomePage } from '../support/pages/HomePage';
 
 
 /// AAA - Arrange, Act, Assert
@@ -13,15 +14,12 @@ test.describe('Consulta de Pedidos', () => {
 
     test.beforeEach(async ({ page }) => {
         console.log('beforeEach: roda antes de cada teste.')
-        // Arrange
-        await page.goto('/')
-        
-        //Checkpoint 1: Validar acesso a página
-        await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
 
-        //Checkpoint 2: Acessar a página de consulta de pedidos
-        await page.getByRole('link', { name: 'Consultar Pedido' }).click()
-        await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
+        const homePage = new HomePage(page);
+        const orderLookupPage = new OrderLookupPage(page);
+        
+        await homePage.navigateToHome();
+        await orderLookupPage.navigateToOrderLookup();
     })
 
     test.afterEach(async () => {
@@ -87,7 +85,8 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.assertOrderResult(order)
+        await orderLookupPage.validateOrderDetails(order)
+        await orderLookupPage.validateStatusBadge(order.status)
 
     })
 
@@ -123,11 +122,7 @@ test.describe('Consulta de Pedidos', () => {
         // await expect(message).toBeVisible()
 
         // Assert
-        await expect(page.locator('#root')).toMatchAriaSnapshot(`
-            - img
-            - heading "Pedido não encontrado" [level=3]
-            - paragraph: Verifique o número do pedido e tente novamente
-            `)
+        await orderLookupPage.validateOrderNotFound()
 
         
 
@@ -155,7 +150,8 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.assertOrderResult(order)
+        await orderLookupPage.validateOrderDetails(order)
+        await orderLookupPage.validateStatusBadge(order.status)
 
     })
 
@@ -181,8 +177,8 @@ test.describe('Consulta de Pedidos', () => {
         await orderLookupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.assertOrderResult(order)
-
+        await orderLookupPage.validateOrderDetails(order)
+        await orderLookupPage.validateStatusBadge(order.status)
     })
 
 })

@@ -25,10 +25,22 @@ export class OrderLookupPage {
     }
 
     /**
+    * Navega até a página de consulta de pedidos a partir da landing page.
+    * Valida o acesso à home e o redirecionamento correto para a página de consulta.
+    */
+    async navigateToOrderLookup() {
+
+        //Checkpoint 2: Acessar a página de consulta de pedidos
+        await this.page.getByRole('link', { name: 'Consultar Pedido' }).click()
+        await expect(this.page.getByRole('heading')).toContainText('Consultar Pedido')
+    }
+
+
+    /**
     * Preenche o campo de busca com o número do pedido e aciona a pesquisa.
     * @param orderNumber - Número do pedido no formato VLO-XXXXXX
     */
-    async searchOrder(orderNumber: string): Promise<void> {
+    async searchOrder(orderNumber: string) {
         await this.searchInput.fill(orderNumber)
         await this.searchButton.click()
     }
@@ -38,7 +50,7 @@ export class OrderLookupPage {
     * estrutura acessível via AriaSnapshot e badge de status (cor e ícone).
     * @param order - Objeto com os dados esperados do pedido
     */
-    async assertOrderResult(order: OrderData): Promise<void> {
+    async validateOrderDetails(order: OrderData) {
         await expect(this.page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
             - img
             - paragraph: Pedido
@@ -68,7 +80,6 @@ export class OrderLookupPage {
             - paragraph: ${order.payment}
             - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
             `)
-        await this.assertStatusBadge(order.status)
     }
 
     /**
@@ -76,7 +87,7 @@ export class OrderLookupPage {
     * classes CSS de cor de fundo, cor de texto e ícone SVG correspondente.
     * @param status - Status esperado: 'APROVADO' | 'REPROVADO' | 'EM_ANALISE'
     */
-    async assertStatusBadge(status: OrderStatus): Promise<void> {
+    async validateStatusBadge(status: OrderStatus) {
 
         const STATUS_CONFIG: Record<OrderStatus, { bgClass: string; textClass: string; iconClass: string }> = {
             APROVADO: { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
@@ -90,5 +101,17 @@ export class OrderLookupPage {
         await expect(statusBadge).toContainClass(bgClass)
         await expect(statusBadge).toContainClass(textClass)
         await expect(statusBadge.locator('svg')).toContainClass(iconClass)
+    }
+
+    /**
+     * Valida a mensagem exibida quando um pedido não é encontrado.
+     * Verifica a estrutura acessível com título e mensagem orientativa ao usuário.
+     */
+    async validateOrderNotFound(){
+        await expect(this.page.locator('#root')).toMatchAriaSnapshot(`
+            - img
+            - heading "Pedido não encontrado" [level=3]
+            - paragraph: Verifique o número do pedido e tente novamente
+            `)
     }
 }
