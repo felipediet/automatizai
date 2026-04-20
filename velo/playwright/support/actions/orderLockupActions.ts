@@ -15,10 +15,21 @@ export type OrderData = {
 }
 
 export function createOrderLockupActions(page: Page) {
-  const searchInput = page.getByTestId('search-order-id')
+    
+  const orderInput = page.getByTestId('search-order-id')
   const searchButton = page.getByTestId('search-order-button')
 
   return {
+
+    elements: {
+      orderInput,
+      searchButton
+    },
+
+    /**
+     * Abre a página de consulta de pedidos
+     * Navega para a home, valida o heading e clica no link "Consultar Pedido"
+     */
     async open() {
       await page.goto('/')
       const heading = page.getByTestId('hero-section').getByRole('heading')
@@ -28,11 +39,20 @@ export function createOrderLockupActions(page: Page) {
       await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
     },
 
+    /**
+     * Pesquisa um pedido pelo número
+     * @param orderNumber - Número do pedido a ser pesquisado
+     */
     async searchOrder(orderNumber: string) {
-      await searchInput.fill(orderNumber)
+      await orderInput.fill(orderNumber)
       await searchButton.click()
     },
 
+    /**
+     * Valida os detalhes completos de um pedido
+     * Verifica número, status, cor, rodas, dados do cliente e informações de pagamento
+     * @param order - Objeto contendo os dados esperados do pedido
+     */
     async validateOrderDetails(order: OrderData) {
       await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
             - img
@@ -65,6 +85,11 @@ export function createOrderLockupActions(page: Page) {
             `)
     },
 
+    /**
+     * Valida o badge de status do pedido
+     * Verifica as classes CSS e ícone correspondentes ao status (APROVADO, REPROVADO ou EM_ANALISE)
+     * @param status - Status do pedido a ser validado
+     */
     async validateStatusBadge(status: OrderStatus) {
       const STATUS_CONFIG: Record<OrderStatus, { bgClass: string; textClass: string; iconClass: string }> = {
         APROVADO: { bgClass: 'bg-green-100', textClass: 'text-green-700', iconClass: 'lucide-circle-check-big' },
@@ -80,6 +105,10 @@ export function createOrderLockupActions(page: Page) {
       await expect(statusBadge.locator('svg')).toContainClass(iconClass)
     },
 
+    /**
+     * Valida a mensagem de erro quando um pedido não é encontrado
+     * Verifica o heading "Pedido não encontrado" e mensagem de orientação
+     */
     async validateOrderNotFound() {
       await expect(page.locator('#root')).toMatchAriaSnapshot(`
             - img

@@ -171,4 +171,14 @@ test.describe('Consulta de Pedidos', () => {
         await app.orderLockup.validateStatusBadge(order.status)
     })
 
+    test('deve manter o botao de busca desabilitato com campo vazio ou apenas espaços', async ({ app, page }) => {
+
+        await app.orderLockup.elements.orderInput.fill('')
+        await expect(app.orderLockup.elements.searchButton).toBeDisabled()
+
+        await app.orderLockup.elements.orderInput.fill('   ')
+        await expect(app.orderLockup.elements.searchButton).toBeDisabled()
+
+    })
+
 })
