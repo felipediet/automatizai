@@ -1,31 +1,20 @@
-import { test, expect } from '@playwright/test'
-import { generateOrderCode } from '../support/helpers';
-import { OrderLockupPage, OrderData } from '../support/pages/OrderLockupPage';
-import { HomePage } from '../support/pages/HomePage';
-import { Navbar } from '../support/components/Navbar';
+import { test, expect } from '../support/fixtures'
+import { generateOrderCode } from '../support/helpers'
+import type { OrderData } from '../support/actions/orderLockupActions'
 
 
 /// AAA - Arrange, Act, Assert
 
 test.describe('Consulta de Pedidos', () => {
 
-    let orderLockupPage: OrderLockupPage;
-
     test.beforeAll(async () => {
         console.log('beforeAll: roda uma vez antes de todos os testes.')
     })
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ app }) => {
         console.log('beforeEach: roda antes de cada teste.')
-
-        //const homePage = new HomePage(page);
-        //const orderLockupPage = new OrderLockupPage(page);
         
-        await new HomePage(page).navigateToHome();
-        await new Navbar(page).orderLockupLink();
-
-        orderLockupPage = new OrderLockupPage(page);
-        await orderLockupPage.validatePageLoaded();
+        await app.orderLockup.open()
     })
 
     test.afterEach(async () => {
@@ -36,14 +25,13 @@ test.describe('Consulta de Pedidos', () => {
         console.log('afterAll: roda uma vez depois de todos os testes.')
     })
 
-    test('deve consultar um pedido APROVADO', async ({ page }) => {
+    test('deve consultar um pedido APROVADO', async ({ app, page }) => {
 
         //Teste Data
         const order = 'VLO-KLUYJE'
 
         // Act
-        //const orderLockupPage = new OrderLockupPage(page);
-        await orderLockupPage.searchOrder(order);
+        await app.orderLockup.searchOrder(order)
 
         // Assert
             //Verificar se o pedido foi encontrado
@@ -69,7 +57,7 @@ test.describe('Consulta de Pedidos', () => {
 
     })
 
-    test('deve consultar um pedido APROVADO - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido APROVADO - com AriaSnapshot', async ({ app }) => {
 
         //Teste Data
         //const order = 'VLO-KLUYJE'
@@ -87,20 +75,20 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        await orderLockupPage.searchOrder(order.number);
+        await app.orderLockup.searchOrder(order.number)
  
         // Assert
-        await orderLockupPage.validateOrderDetails(order)
-        await orderLockupPage.validateStatusBadge(order.status)
+        await app.orderLockup.validateOrderDetails(order)
+        await app.orderLockup.validateStatusBadge(order.status)
 
     })
 
-    test('deve exibir a mensagem quando o pedido nao é encontrado', async ({ page }) => {
+    test('deve exibir a mensagem quando o pedido nao é encontrado', async ({ app }) => {
     
         const order = generateOrderCode();
         
         // Act
-        await orderLockupPage.searchOrder(order);
+        await app.orderLockup.searchOrder(order)
         
 
         // Assert
@@ -126,13 +114,13 @@ test.describe('Consulta de Pedidos', () => {
         // await expect(message).toBeVisible()
 
         // Assert
-        await orderLockupPage.validateOrderNotFound()
+        await app.orderLockup.validateOrderNotFound()
 
         
 
     })
 
-    test('deve consultar um pedido REPROVADO - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido REPROVADO - com AriaSnapshot', async ({ app }) => {
 
         //Teste Data
         //const order = 'VLO-UWM26W'
@@ -150,15 +138,15 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        await orderLockupPage.searchOrder(order.number);
+        await app.orderLockup.searchOrder(order.number)
  
         // Assert
-        await orderLockupPage.validateOrderDetails(order)
-        await orderLockupPage.validateStatusBadge(order.status)
+        await app.orderLockup.validateOrderDetails(order)
+        await app.orderLockup.validateStatusBadge(order.status)
 
     })
 
-    test('deve consultar um pedido EM ANALISE - com AriaSnapshot', async ({ page }) => {
+    test('deve consultar um pedido EM ANALISE - com AriaSnapshot', async ({ app }) => {
 
         //Teste Data
         //const order = 'VLO-UWM26W'
@@ -176,11 +164,11 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        await orderLockupPage.searchOrder(order.number);
+        await app.orderLockup.searchOrder(order.number)
  
         // Assert
-        await orderLockupPage.validateOrderDetails(order)
-        await orderLockupPage.validateStatusBadge(order.status)
+        await app.orderLockup.validateOrderDetails(order)
+        await app.orderLockup.validateStatusBadge(order.status)
     })
 
 })
