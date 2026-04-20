@@ -14,7 +14,7 @@ export type OrderData = {
     payment: string
 }
 
-export class OrderLookupPage {
+export class OrderLockupPage {
 
     private readonly searchInput
     private readonly searchButton
@@ -25,13 +25,9 @@ export class OrderLookupPage {
     }
 
     /**
-    * Navega até a página de consulta de pedidos a partir da landing page.
     * Valida o acesso à home e o redirecionamento correto para a página de consulta.
     */
-    async navigateToOrderLookup() {
-
-        //Checkpoint 2: Acessar a página de consulta de pedidos
-        await this.page.getByRole('link', { name: 'Consultar Pedido' }).click()
+    async validatePageLoaded() {
         await expect(this.page.getByRole('heading')).toContainText('Consultar Pedido')
     }
 

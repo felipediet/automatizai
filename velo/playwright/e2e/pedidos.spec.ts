@@ -1,12 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers';
-import { OrderLookupPage, OrderData } from '../support/pages/OrderLookupPage';
+import { OrderLockupPage, OrderData } from '../support/pages/OrderLockupPage';
 import { HomePage } from '../support/pages/HomePage';
+import { Navbar } from '../support/components/Navbar';
 
 
 /// AAA - Arrange, Act, Assert
 
 test.describe('Consulta de Pedidos', () => {
+
+    let orderLockupPage: OrderLockupPage;
 
     test.beforeAll(async () => {
         console.log('beforeAll: roda uma vez antes de todos os testes.')
@@ -15,11 +18,14 @@ test.describe('Consulta de Pedidos', () => {
     test.beforeEach(async ({ page }) => {
         console.log('beforeEach: roda antes de cada teste.')
 
-        const homePage = new HomePage(page);
-        const orderLookupPage = new OrderLookupPage(page);
+        //const homePage = new HomePage(page);
+        //const orderLockupPage = new OrderLockupPage(page);
         
-        await homePage.navigateToHome();
-        await orderLookupPage.navigateToOrderLookup();
+        await new HomePage(page).navigateToHome();
+        await new Navbar(page).orderLockupLink();
+
+        orderLockupPage = new OrderLockupPage(page);
+        await orderLockupPage.validatePageLoaded();
     })
 
     test.afterEach(async () => {
@@ -36,8 +42,8 @@ test.describe('Consulta de Pedidos', () => {
         const order = 'VLO-KLUYJE'
 
         // Act
-        const orderLookupPage = new OrderLookupPage(page);
-        await orderLookupPage.searchOrder(order);
+        //const orderLockupPage = new OrderLockupPage(page);
+        await orderLockupPage.searchOrder(order);
 
         // Assert
             //Verificar se o pedido foi encontrado
@@ -81,12 +87,11 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        const orderLookupPage = new OrderLookupPage(page);
-        await orderLookupPage.searchOrder(order.number);
+        await orderLockupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.validateOrderDetails(order)
-        await orderLookupPage.validateStatusBadge(order.status)
+        await orderLockupPage.validateOrderDetails(order)
+        await orderLockupPage.validateStatusBadge(order.status)
 
     })
 
@@ -95,8 +100,7 @@ test.describe('Consulta de Pedidos', () => {
         const order = generateOrderCode();
         
         // Act
-        const orderLookupPage = new OrderLookupPage(page);
-        await orderLookupPage.searchOrder(order);
+        await orderLockupPage.searchOrder(order);
         
 
         // Assert
@@ -122,7 +126,7 @@ test.describe('Consulta de Pedidos', () => {
         // await expect(message).toBeVisible()
 
         // Assert
-        await orderLookupPage.validateOrderNotFound()
+        await orderLockupPage.validateOrderNotFound()
 
         
 
@@ -146,12 +150,11 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        const orderLookupPage = new OrderLookupPage(page);
-        await orderLookupPage.searchOrder(order.number);
+        await orderLockupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.validateOrderDetails(order)
-        await orderLookupPage.validateStatusBadge(order.status)
+        await orderLockupPage.validateOrderDetails(order)
+        await orderLockupPage.validateStatusBadge(order.status)
 
     })
 
@@ -173,12 +176,11 @@ test.describe('Consulta de Pedidos', () => {
         }
 
         // Act
-        const orderLookupPage = new OrderLookupPage(page);
-        await orderLookupPage.searchOrder(order.number);
+        await orderLockupPage.searchOrder(order.number);
  
         // Assert
-        await orderLookupPage.validateOrderDetails(order)
-        await orderLookupPage.validateStatusBadge(order.status)
+        await orderLockupPage.validateOrderDetails(order)
+        await orderLockupPage.validateStatusBadge(order.status)
     })
 
 })
