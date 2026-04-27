@@ -63,5 +63,11 @@ export function createConfiguratorActions(page: Page) {
     async assertTextVisible(text: string) {
       await expect(page.getByText(text)).toBeVisible()
     },
+
+    async assembleYourself() {
+      await page.getByRole('button', { name: 'Monte o Seu' }).click()
+    },
+
+    
   }
 }
