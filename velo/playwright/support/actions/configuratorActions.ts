@@ -6,12 +6,14 @@ export function createConfiguratorActions(page: Page) {
   const previewImageByAccessibleName = page.getByRole('img', {
     name: /Velô Sprint - .* with .* wheels/i,
   })
+  const heading = page.getByRole('heading', { name: 'Velô Sprint' })
 
   return {
     elements: {
       totalPrice,
       previewImageByAltPrefix,
       previewImageByAccessibleName,
+      heading,
     },
 
     /**
@@ -19,6 +21,14 @@ export function createConfiguratorActions(page: Page) {
      */
     async open() {
       await page.goto('/configure')
+    },
+
+    /**
+     * Verifica se está na página do configurador
+     */
+    async assertOnPage() {
+      await expect(page).toHaveURL(/\/configure$/)
+      await expect(heading).toBeVisible()
     },
 
     /**

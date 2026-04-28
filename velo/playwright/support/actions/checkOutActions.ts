@@ -3,13 +3,15 @@ import { expect, Page } from '@playwright/test'
 export function createCheckOutActions(page: Page) {
   const summaryTotalPrice = page.getByTestId('summary-total-price')
   const heading = page.getByRole('heading', { name: 'Finalizar Pedido' })
-  const voltar = page.getByRole('button').filter({ hasText: /^$/ })
+  const backButtonByTestId = page.getByTestId('order-back-button')
+  const backButtonByRole = page.getByRole('button', { name: /voltar/i })
 
   return {
     elements: {
       summaryTotalPrice,
       heading,
-      voltar
+      backButtonByTestId,
+      backButtonByRole,
     },
 
     /**
@@ -23,6 +25,7 @@ export function createCheckOutActions(page: Page) {
      * Verifica se está na página de pedido validando a visibilidade do título
      */
     async assertOnPage() {
+      await expect(page).toHaveURL(/\/order$/)
       await expect(heading).toBeVisible()
     },
 
@@ -39,7 +42,11 @@ export function createCheckOutActions(page: Page) {
      * Clica no botão voltar para retornar à página anterior
      */
     async clickVoltar() {
-      await voltar.click()
+      if (await backButtonByTestId.count()) {
+        await backButtonByTestId.first().click()
+        return
+      }
+      await backButtonByRole.click()
     }
   }
 }

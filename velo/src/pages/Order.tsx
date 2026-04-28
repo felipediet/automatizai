@@ -76,6 +76,9 @@ const colorLabels: Record<ExteriorColor, string> = {
   'midnight-black': 'Midnight Black',
 };
 
+// Workaround de tipagem para compatibilidade do react-input-mask com os tipos JSX atuais.
+const InputMaskField = InputMask as unknown as React.ComponentType<any>;
+
 const Order = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -241,6 +244,8 @@ const Order = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/configure')}
+              data-testid="order-back-button"
+              aria-label="Voltar"
               className="p-2 rounded-lg hover:bg-secondary transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -298,7 +303,7 @@ const Order = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Telefone</Label>
-                    <InputMask
+                    <InputMaskField
                       mask="(99) 99999-9999"
                       value={formData.phone}
                       onChange={(e) => handleChange('phone', e.target.value)}
@@ -311,12 +316,12 @@ const Order = () => {
                           className={cn(errors.phone && 'border-destructive')}
                         />
                       )}
-                    </InputMask>
+                    </InputMaskField>
                     {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cpf">CPF</Label>
-                    <InputMask
+                    <InputMaskField
                       mask="999.999.999-99"
                       value={formData.cpf}
                       onChange={(e) => handleChange('cpf', e.target.value)}
@@ -329,7 +334,7 @@ const Order = () => {
                           className={cn(errors.cpf && 'border-destructive')}
                         />
                       )}
-                    </InputMask>
+                    </InputMaskField>
                     {errors.cpf && <p className="text-sm text-destructive">{errors.cpf}</p>}
                   </div>
                   <div className="space-y-2">
