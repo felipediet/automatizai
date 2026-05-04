@@ -1,169 +1,66 @@
 import { test, expect } from '../support/fixtures'
 import { generateOrderCode } from '../support/helpers'
-import { createDbClient, destroyDbClient } from '../support/database/client'
-import { createTestOrder, deleteTestOrder } from '../support/database/orderFactory'
-import type { Kysely } from 'kysely'
-import type { Database } from '../support/database/schema'
+import type { OrderDetails } from '../support/actions/orderLookupActions'
+import { insertOrder, deleteOrderByNumber } from '../support/database/orderRepository'
 
+import testData from '../support/fixtures/orders.json' with { type: 'json' }
 
-/// AAA - Arrange, Act, Assert
+test.describe('Consulta de Pedido', () => {
 
-test.describe('Consulta de Pedidos', () => {
+  test.beforeEach(async ({ app }) => {
+    await app.orderLookup.open()
+  })
 
-    let db: Kysely<Database>
+  test('deve consultar um pedido aprovado', async ({ app }) => {
+    const order: OrderDetails = testData.aprovado as OrderDetails
 
-    test.beforeAll(async () => {
-        db = await createDbClient()
-    })
+    await deleteOrderByNumber(order.number)
+    await insertOrder(order)
 
-    test.beforeEach(async ({ app }) => {
-        await app.orderLockup.open()
-    })
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
+  })
 
-    test.afterAll(async () => {
-        await destroyDbClient(db)
-    })
+  test('deve consultar um pedido reprovado', async ({ app }) => {
+    const order: OrderDetails = testData.reprovado as OrderDetails
 
-    test('deve consultar um pedido APROVADO', async ({ app, page }) => {
+    await deleteOrderByNumber(order.number)
+    await insertOrder(order)
 
-        const order_number = 'VLO-SEARCH'
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
+  })
 
-        // Cleanup
-        await deleteTestOrder(db, order_number)
+  test('deve consultar um pedido em analise', async ({ app }) => {
+    const order: OrderDetails = testData.em_analise as OrderDetails
 
-        // Arrange
-        const order = await createTestOrder(db, 'APROVADO', {
-            order_number: order_number,
-            color: 'lunar-white',
-            wheel_type: 'sport',
-            customer_name: 'Felipe Diet',
-            customer_email: 'diet@velo.dev',
-            payment_method: 'avista',
-        })
+    await deleteOrderByNumber(order.number)
+    await insertOrder(order)
 
-        // Act
-        await app.orderLockup.searchOrder(order.number)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
+  })
 
-        // Assert
-        const containerPedido = page.getByRole('paragraph')
-            .filter({hasText: /^Pedido$/})
-            .locator('..')
+  test('deve exibir mensagem quando o pedido não é encontrado', async ({ app }) => {
+    const order = generateOrderCode()
+    await app.orderLookup.searchOrder(order)
+    await app.orderLookup.validateOrderNotFound()
+  })
 
-        await expect(containerPedido).toContainText(order.number, {timeout: 10_000})
-        await expect(page.getByText('APROVADO')).toBeVisible()
+  test('deve exibir mensagem quando o código do pedido está fora do padrão', async ({ app }) => {
+    const orderCode = 'XYZ-999-INVALIDO'
+    await app.orderLookup.searchOrder(orderCode)
+    await app.orderLookup.validateOrderNotFound()
+  })
 
-        // Cleanup
-    
+  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app, page }) => {
+    const button = app.orderLookup.elements.searchButton
+    await expect(button).toBeDisabled()
 
-    })
-
-    test('deve consultar um pedido APROVADO - com AriaSnapshot', async ({ app }) => {
-
-        const order_number = 'VLO-SEARC1'
-
-        // Cleanup
-        await deleteTestOrder(db, order_number)
-
-        // Arrange
-        const order = await createTestOrder(db, 'APROVADO', {
-            order_number: order_number,
-            color: 'lunar-white',
-            wheel_type: 'sport',
-            customer_name: 'Felipe Diet',
-            customer_email: 'diet@velo.dev',
-            payment_method: 'avista',
-        })
-
-        // Act
-        await app.orderLockup.searchOrder(order.number)
-
-        // Assert
-        await app.orderLockup.validateOrderDetails(order)
-        await app.orderLockup.validateStatusBadge(order.status)
-
-
-
-    })
-
-    test('deve exibir a mensagem quando o pedido nao é encontrado', async ({ app }) => {
-
-        // Arrange
-        const order = generateOrderCode()
-
-        // Act
-        await app.orderLockup.searchOrder(order)
-
-        // Assert
-        await app.orderLockup.validateOrderNotFound()
-
-    })
-
-    test('deve consultar um pedido REPROVADO - com AriaSnapshot', async ({ app }) => {
-
-        const order_number = 'VLO-SEARC2'
-
-        // Cleanup
-        await deleteTestOrder(db, order_number)
-
-        // Arrange
-        const order = await createTestOrder(db, 'REPROVADO', {
-            order_number: order_number,
-            color: 'midnight-black',
-            wheel_type: 'sport',
-            customer_name: 'Steve Jobs',
-            customer_email: 'jobs@apple.com',
-            payment_method: 'avista',
-        })
-
-        // Act
-        await app.orderLockup.searchOrder(order.number)
-
-        // Assert
-        await app.orderLockup.validateOrderDetails(order)
-        await app.orderLockup.validateStatusBadge(order.status)
-
-        // Cleanup
-        //await deleteTestOrder(db, order.number)
-
-    })
-
-    test('deve consultar um pedido EM ANALISE - com AriaSnapshot', async ({ app }) => {
-
-        const order_number = 'VLO-SEARC3'
-
-        // Cleanup
-        await deleteTestOrder(db, order_number)
-
-        // Arrange
-        const order = await createTestOrder(db, 'EM_ANALISE', {
-            order_number: order_number,
-            color: 'lunar-white',
-            wheel_type: 'aero',
-            customer_name: 'Joao da Silva',
-            customer_email: 'joao@velo.dev',
-            payment_method: 'financiamento',
-        })
-
-        // Act
-        await app.orderLockup.searchOrder(order.number)
-
-        // Assert
-        await app.orderLockup.validateOrderDetails(order)
-        await app.orderLockup.validateStatusBadge(order.status)
-
-        // Cleanup
-        //await deleteTestOrder(db, order.number)
-
-    })
-
-    test('deve manter o botao de busca desabilitato com campo vazio ou apenas espaços', async ({ app, page }) => {
-
-        await app.orderLockup.elements.orderInput.fill('')
-        await expect(app.orderLockup.elements.searchButton).toBeDisabled()
-
-        await app.orderLockup.elements.orderInput.fill('   ')
-        await expect(app.orderLockup.elements.searchButton).toBeDisabled()
-
-    })
-
+    await app.orderLookup.elements.orderInput.fill('     ')
+    await expect(button).toBeDisabled()
+  })
 })

@@ -1,130 +1,44 @@
-import { expect, Page } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 
 export function createConfiguratorActions(page: Page) {
-  const totalPrice = page.getByTestId('total-price')
-  const previewImageByAltPrefix = page.locator('img[alt^="Velô Sprint"]')
-  const previewImageByAccessibleName = page.getByRole('img', {
-    name: /Velô Sprint - .* with .* wheels/i,
-  })
-  const heading = page.getByRole('heading', { name: 'Velô Sprint' })
+  const optionalCheckbox = (name: string | RegExp) => page.getByRole('checkbox', { name })
 
   return {
-    elements: {
-      totalPrice,
-      previewImageByAltPrefix,
-      previewImageByAccessibleName,
-      heading,
-    },
-
-    /**
-     * Navega para a página do configurador
-     */
     async open() {
       await page.goto('/configure')
     },
 
-    /**
-     * Verifica se está na página do configurador
-     */
-    async assertOnPage() {
-      await expect(page).toHaveURL(/\/configure$/)
-      await expect(heading).toBeVisible()
+    async selectColor(name: string) {
+      await page.getByRole('button', { name }).click()
     },
 
-    /**
-     * Seleciona uma opção de cor pelo nome
-     * @param colorName - O nome da cor a ser selecionada
-     */
-    async selectColor(colorName: string) {
-      await page.getByRole('button', { name: colorName }).click()
+    async selectWheels(name: string | RegExp) {
+      await page.getByRole('button', { name }).click()
     },
 
-    /**
-     * Seleciona opção de rodas pelo nome ou padrão
-     * @param wheelsName - O nome ou padrão regex das rodas a serem selecionadas
-     */
-    async selectWheels(wheelsName: string | RegExp) {
-      await page.getByRole('button', { name: wheelsName }).click()
+    async expectPrice(price: string) {
+      const priceElement = page.getByTestId('total-price')
+      await expect(priceElement).toBeVisible()
+      await expect(priceElement).toHaveText(price)
     },
 
-    /**
-     * Alterna um checkbox de recurso opcional
-     * @param optionalName - O nome ou padrão regex do recurso opcional
-     */
-    async toggleOptional(optionalName: string | RegExp) {
-      await page.getByRole('checkbox', { name: optionalName }).click()
+    async expectCarImageSrc(src: string) {
+      const carImage = page.locator('img[alt^="Velô Sprint"]')
+      await expect(carImage).toHaveAttribute('src', src)
     },
 
-    /**
-     * Verifica que o preço total é visível e corresponde ao valor esperado
-     * @param price - O texto do preço esperado
-     */
-    async assertTotalPrice(price: string) {
-      await expect(totalPrice).toBeVisible()
-      await expect(totalPrice).toHaveText(price)
+    async checkOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).check()
     },
 
-    /**
-     * Verifica que a imagem de visualização possui a origem esperada
-     * @param src - A URL de origem da imagem esperada
-     */
-    async assertPreviewSrc(src: string) {
-      await expect(previewImageByAltPrefix).toHaveAttribute('src', src)
+    async uncheckOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).uncheck()
     },
 
-    /**
-     * Verifica que a imagem de visualização possui o nome acessível esperado
-     * @param name - O nome acessível esperado ou padrão regex
-     */
-    async assertPreviewAccessibleName(name: string | RegExp) {
-      await expect(previewImageByAccessibleName).toHaveAccessibleName(name)
-    },
-
-    /**
-     * Verifica que um botão de cor é visível
-     * @param colorName - O nome do botão de cor
-     */
-    async assertColorButtonVisible(colorName: string) {
-      await expect(page.getByRole('button', { name: colorName })).toBeVisible()
-    },
-
-    /**
-     * Verifica que um botão de rodas é visível
-     * @param wheelsName - O nome ou padrão regex do botão de rodas
-     */
-    async assertWheelsButtonVisible(wheelsName: string | RegExp) {
-      await expect(page.getByRole('button', { name: wheelsName })).toBeVisible()
-    },
-
-    /**
-     * Verifica se um checkbox de recurso opcional está marcado ou desmarcado
-     * @param optionalName - O nome ou padrão regex do recurso opcional
-     * @param checked - Se o checkbox deve estar marcado true para marcado ou false para desmarcado
-     */
-    async assertOptionalChecked(optionalName: string | RegExp, checked: boolean) {
-      const checkbox = page.getByRole('checkbox', { name: optionalName })
-      if (checked) {
-        await expect(checkbox).toBeChecked()
-        return
-      }
-      await expect(checkbox).not.toBeChecked()
-    },
-
-    /**
-     * Verifica que um texto é visível na página
-     * @param text - O texto a encontrar e verificar visibilidade
-     */
-    async assertTextVisible(text: string) {
-      await expect(page.getByText(text)).toBeVisible()
-    },
-
-    /**
-     * Clica no botão "Monte o Seu"
-     */
-    async assembleYourself() {
+    async finishConfigurator() {
       await page.getByRole('button', { name: 'Monte o Seu' }).click()
     },
-
-
   }
 }

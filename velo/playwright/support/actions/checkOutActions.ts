@@ -1,53 +1,13 @@
-import { expect, Page } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 
-export function createCheckOutActions(page: Page) {
-  const summaryTotalPrice = page.getByTestId('summary-total-price')
-  const heading = page.getByRole('heading', { name: 'Finalizar Pedido' })
-  const backButtonByTestId = page.getByTestId('order-back-button')
-  const backButtonByRole = page.getByRole('button', { name: /voltar/i })
-
+export function createCheckoutActions(page: Page) {
   return {
-    elements: {
-      summaryTotalPrice,
-      heading,
-      backButtonByTestId,
-      backButtonByRole,
+    async expectLoaded() {
+      await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
     },
 
-    /**
-     * Navega para a página de pedido
-     */
-    async open() {
-      await page.goto('/order')
+    async expectSummaryTotal(price: string) {
+      await expect(page.getByTestId('summary-total-price')).toHaveText(price)
     },
-
-    /**
-     * Verifica se está na página de pedido validando a visibilidade do título
-     */
-    async assertOnPage() {
-      await expect(page).toHaveURL(/\/order$/)
-      await expect(heading).toBeVisible()
-    },
-
-    /**
-     * Valida o preço total do resumo do pedido
-     * @param price - O preço esperado a ser verificado
-     */
-    async assertSummaryTotalPrice(price: string) {
-      await expect(summaryTotalPrice).toBeVisible()
-      await expect(summaryTotalPrice).toHaveText(price)
-    },
-
-    /**
-     * Clica no botão voltar para retornar à página anterior
-     */
-    async clickVoltar() {
-      if (await backButtonByTestId.count()) {
-        await backButtonByTestId.first().click()
-        return
-      }
-      await backButtonByRole.click()
-    }
   }
 }
-
