@@ -31,6 +31,19 @@ interface OrderOverrides {
   total_price?: string
 }
 
+
+/**
+ * Cria um pedido de teste no banco de dados.
+ *
+ * @param db - Instância do cliente Kysely conectado ao banco de dados.
+ * @param status - Status inicial do pedido (ex: 'APROVADO', 'EM_ANALISE', 'REPROVADO').
+ * @param overrides - Campos opcionais para sobrescrever os valores padrão do pedido:
+ *   - `order_number` — Número do pedido. Default: gerado automaticamente via `generateOrderCode()`.
+ *   - `color` — Cor do veículo (`'glacier-blue'` | `'lunar-white'` | `'midnight-black'`). Default: `'glacier-blue'`.
+ *   - `wheel_type` — Tipo de roda (`'aero'` | `'sport'`). Default: `'aero'`.
+ *   - `payment_method` — Método de pagamento (`'avista'` | `'financiamento'`). Default: `'avista'`
+ * @returns Os dados do pedido criado, no formato esperado pelas ações de teste.
+ */
 export async function createTestOrder(
   db: Kysely<Database>,
   status: OrderStatus,
@@ -71,6 +84,12 @@ export async function createTestOrder(
   }
 }
 
+/**
+ * Remove um pedido de teste do banco de dados pelo número do pedido.
+ *
+ * @param db - Instância do cliente Kysely conectado ao banco de dados.
+ * @param orderNumber - Número único do pedido a ser removido.
+ */
 export async function deleteTestOrder(
   db: Kysely<Database>,
   orderNumber: string
