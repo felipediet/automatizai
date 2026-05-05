@@ -9,6 +9,9 @@ export function createCheckoutActions(page: Page) {
     elements: {
       heading: page.getByRole('heading', { name: 'Finalizar Pedido' }),
       summaryTotalPrice: page.getByTestId('summary-total-price'),
+      paymentCash: page.getByRole('button', { name: 'À Vista' }),
+      paymentFinance: page.getByRole('button', { name: 'Financiamento' }),
+      successHeading: page.getByRole('heading', { name: 'Pedido Aprovado!' }),
       submitButton: page.getByTestId('checkout-submit'),
       form: page.locator('form'),
       nameInput: page.getByTestId('checkout-name'),
@@ -80,6 +83,14 @@ export function createCheckoutActions(page: Page) {
 
     async acceptTerms() {
       await this.elements.terms.check()
+    },
+
+    async selectPaymentCash() {
+      await this.elements.paymentCash.click()
+    },
+
+    async expectOrderApproved() {
+      await expect(this.elements.successHeading).toBeVisible()
     }
 
     

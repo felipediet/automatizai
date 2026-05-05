@@ -38,5 +38,18 @@ export async function insertOrder(order: OrderDetails) {
 }
 
 export async function deleteOrderByNumber(orderNumber: string) {
-  await db.deleteFrom('orders').where('order_number', '=', orderNumber).execute()
+  try {
+    await db.deleteFrom('orders').where('order_number', '=', orderNumber).execute()
+  } catch (error) {
+    console.error(`Error deleting order with number ${orderNumber}:`, error)
+  }
+}
+
+
+  export async function deleteOrderByCPFDocument(cpfDocument: string) {
+  try {
+    await db.deleteFrom('orders').where('customer_cpf', '=', cpfDocument).execute()
+  } catch (error) {
+    console.error(`Error deleting order with CPF ${cpfDocument}:`, error)
+  }
 }

@@ -1,4 +1,5 @@
-﻿import { test, expect } from '../support/fixtures'
+﻿import { deleteOrderByCPFDocument, deleteOrderByNumber } from '../support/database/orderRepository'
+import { test, expect } from '../support/fixtures'
 
 const VALID_DATA = {
   name: 'Fernando',
@@ -10,11 +11,15 @@ const VALID_DATA = {
 }
 
 test.describe('Checkout', () => {
-  test.beforeEach(async ({ app }) => {
-    await app.checkout.open()
-  })
+
 
   test.describe('Validações de Campos Obrigatórios', () => {
+
+    test.beforeEach(async ({ app }) => {
+      await app.checkout.open()
+    })
+
+
     test('deve exibir erros ao submeter formulário em branco', async ({ app }) => {
       await app.checkout.submit()
 
@@ -76,5 +81,53 @@ test.describe('Checkout', () => {
 
   })
 
+  test.describe('Pagamento e confirmação', () => {
+
+    test('deve criar um pedido com sucesso para pagamento à vista', async ({ page, app }) => {
+      const CHECKOUT_CASH_DATA = {
+        name: 'Bruce',
+        lastname: 'Wayne',
+        email: 'bruce.wayne@waynecorp.com',
+        phone: '(11) 97777-6666',
+        document: '780.228.290-05',
+        store: 'Velô Paulista - Av. Paulista, 1000',
+        totalPrice: 'R$ 40.000,00',
+        color: 'Glacier Blue',
+        wheels: 'Aero Wheels'
+      }
+
+      // Cleanup - API
+      await deleteOrderByCPFDocument(CHECKOUT_CASH_DATA.document)
+
+      // Arrange - Landing Page
+      await page.goto('/')
+      await page.getByRole('link', { name: 'Configure Agora' }).click()
+
+      // Arrange - Configurator
+      await app.configurator.selectColor(CHECKOUT_CASH_DATA.color)
+      await app.configurator.selectWheels(CHECKOUT_CASH_DATA.wheels)
+      await app.configurator.expectPrice(CHECKOUT_CASH_DATA.totalPrice)
+      await app.configurator.finishConfigurator()
+
+      // Act - Checkout
+      await app.checkout.expectLoaded()
+      await app.checkout.fillCustomerData(CHECKOUT_CASH_DATA)
+      await app.checkout.selectPaymentCash()
+      
+      await app.checkout.expectSummaryTotal(CHECKOUT_CASH_DATA.totalPrice)
+      await expect(app.checkout.elements.paymentCash).toContainText(CHECKOUT_CASH_DATA.totalPrice)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectOrderApproved()
+
+      // Cleanup - API
+      const orderNumber = await page.getByTestId('order-id').innerText()
+        console.log(`Order number for cleanup: ${orderNumber}`)
+      await deleteOrderByNumber(orderNumber)
+    })
+
+  })
 
 })
