@@ -89,6 +89,10 @@ export function createCheckoutActions(page: Page) {
       await this.elements.paymentCash.click()
     },
 
+        async selectPaymentFinance() {
+      await this.elements.paymentFinance.click()
+    },
+
     async expectOrderApproved() {
       await expect(this.elements.successHeading).toBeVisible()
     }

@@ -128,6 +128,63 @@ test.describe('Checkout', () => {
       await deleteOrderByNumber(orderNumber)
     })
 
-  })
+    test('deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento', async ({ page, app }) => {
+      const CHECKOUT_FINANCE_DATA = {
+        name: 'Pedro',
+        lastname: 'Pascal',
+        email: 'pedro.pascal@themyscira.com',
+        phone: '(11) 97777-6666',
+        document: '956.250.790-48',
+        store: 'Velô Paulista - Av. Paulista, 1000',
+        totalPrice: 'R$ 42.000,00',
+        totalPriceWithInterest: 'R$ 42.840,00',
+        color: 'Lunar White',
+        wheels: 'Sport Wheels'
+      }
+
+      // Cleanup - API
+      await deleteOrderByCPFDocument(CHECKOUT_FINANCE_DATA.document)
+
+      await page.route('**/functions/v1/credit-analysis', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ 
+            status: 'Done',
+            score: 701 
+          })
+        })
+      })
+
+      // Arrange - Landing Page
+      await page.goto('/')
+      await page.getByRole('link', { name: 'Configure Agora' }).click()
+
+      // Arrange - Configurator
+      await app.configurator.selectColor(CHECKOUT_FINANCE_DATA.color)
+      await app.configurator.selectWheels(CHECKOUT_FINANCE_DATA.wheels)
+      await app.configurator.expectPrice(CHECKOUT_FINANCE_DATA.totalPrice)
+      await app.configurator.finishConfigurator()
+
+      // Act - Checkout
+      await app.checkout.expectLoaded()
+      await app.checkout.fillCustomerData(CHECKOUT_FINANCE_DATA)
+      await app.checkout.selectPaymentFinance()
+      
+      // await app.checkout.expectSummaryTotal(CHECKOUT_FINANCE_DATA.totalPriceWithInterest)
+      // await expect(app.checkout.elements.paymentFinance).toContainText(CHECKOUT_FINANCE_DATA.totalPriceWithInterest)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectOrderApproved()
+
+      // Cleanup - API
+      const orderNumber = await page.getByTestId('order-id').innerText()
+        console.log(`Order number for cleanup: ${orderNumber}`)
+      await deleteOrderByNumber(orderNumber)
+    })
+
+})
 
 })
