@@ -1,4 +1,4 @@
-﻿import { deleteOrderByCPFDocument, deleteOrderByNumber } from '../support/database/orderRepository'
+import { deleteOrderByCPFDocument, deleteOrderByNumber } from '../support/database/orderRepository'
 import { test, expect } from '../support/fixtures'
 
 const VALID_DATA = {
@@ -182,6 +182,71 @@ test.describe('Checkout', () => {
       // Cleanup - API
       const orderNumber = await page.getByTestId('order-id').innerText()
         console.log(`Order number for cleanup: ${orderNumber}`)
+      await deleteOrderByNumber(orderNumber)
+    })
+
+    test('deve enviar pedido para análise quando score do CPF for entre 501 e 700 no financiamento', async ({ page, app }) => {
+      const CHECKOUT_FINANCE_ANALYSIS_DATA = {
+        name: 'Clark',
+        lastname: 'Kent',
+        email: 'clark.kent@dailyplanet.com',
+        phone: '(11) 98888-7777',
+        document: '338.197.220-09',
+        store: 'Velô Paulista - Av. Paulista, 1000',
+        totalPrice: 'R$ 42.000,00',
+        color: 'Lunar White',
+        wheels: 'Sport Wheels'
+      }
+
+      // Cleanup - API
+      await deleteOrderByCPFDocument(CHECKOUT_FINANCE_ANALYSIS_DATA.document)
+
+      await page.route('**/functions/v1/credit-analysis', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ 
+            status: 'Done',
+            score: 600 
+          })
+        })
+      })
+
+      // Arrange - Landing Page
+      await page.goto('/')
+      await page.getByRole('link', { name: 'Configure Agora' }).click()
+
+      // Arrange - Configurator
+      await app.configurator.selectColor(CHECKOUT_FINANCE_ANALYSIS_DATA.color)
+      await app.configurator.selectWheels(CHECKOUT_FINANCE_ANALYSIS_DATA.wheels)
+      await app.configurator.expectPrice(CHECKOUT_FINANCE_ANALYSIS_DATA.totalPrice)
+      await app.configurator.finishConfigurator()
+
+      // Act - Checkout
+      await app.checkout.expectLoaded()
+      await app.checkout.fillCustomerData(CHECKOUT_FINANCE_ANALYSIS_DATA)
+      await app.checkout.selectPaymentFinance()
+      
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert status visual de Pedido em Análise na página de sucesso
+      await expect(page.getByTestId('success-status')).toHaveText('Pedido em Análise')
+
+      // Extra: obter ID do pedido e buscar no Order Lookup para validar o ícone de relógio ou status correspondente
+      const orderNumberLocator = page.getByTestId('order-id')
+      await expect(orderNumberLocator).toBeVisible()
+      const orderNumber = await orderNumberLocator.innerText()
+
+      await page.goto('/lookup')
+      await page.getByTestId('search-order-id').fill(orderNumber)
+      await page.getByTestId('search-order-button').click()
+
+      // Assert status no order lookup
+      await expect(page.getByTestId('order-result-status')).toContainText('EM_ANALISE')
+
+      // Cleanup - API
+      console.log(`Order number for cleanup: ${orderNumber}`)
       await deleteOrderByNumber(orderNumber)
     })
 
